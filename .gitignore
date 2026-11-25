@@ -1,0 +1,9 @@
+.env
+.env.*
+*.pgpass
+.pgpass
+pgpass.conf
+*.pem
+*.key
+*.mp4
+*.wav

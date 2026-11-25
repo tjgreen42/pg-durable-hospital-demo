@@ -1,0 +1,36 @@
+Nightly knowledge refresh for hospital agents
+
+Start with docs/knowledge-refresh-brief.pdf. To see a recorded run without a
+database, open option3/run-output.txt. All sample pages are synthetic.
+
+Source
+  option3/refresh.sql  - schema, AI pipelines, publication, rollback and search
+  option3/run.ps1      - sample pages, refresh scenarios and assertions
+  option3/inspect.sql  - read-only release decisions, job status and final lookup
+
+Run in an authorized TEST database only. The runner creates functions,
+tables, AI pipeline definitions and synthetic releases in hospital_refresh_lab
+and leaves them available for inspection.
+
+Prerequisites: PowerShell, psql on PATH, and a HorizonDB writer with
+pg_durable preloaded and installed, azure_ai and vector installed, and
+permission to create the lab schema and pipelines. The recorded run used
+PostgreSQL 17, pg_durable 0.2.9 and azure_ai 2.5.6.
+
+From the repository root, set PGHOST, PGDATABASE, PGUSER and
+PGSSLMODE for your test database. Configure your local libpq password file
+or PGPASSFILE; do not put credentials in the scripts. Then run:
+
+  .\option3\run.ps1 -Mode chunks -ProbeMissingModels
+  psql -X -v agent=<agent-printed-by-runner> -f .\option3\inspect.sql
+
+Replace the placeholder with the actual agent ID. The default chunking path
+requires no registered model. The optional missing-model drill deliberately
+requests absent aliases: the candidate should be rejected, and the previous
+version should remain live.
+
+Successful model inference was not exercised in the recorded run. To use
+the model-backed path, supply approved registered embedding and chat model
+aliases to run.ps1 using -Mode models, -EmbeddingModel and -ChatModel.
+This mode sends synthetic input to the configured endpoints and may incur
+charges; it is not needed for the recorded demonstration.
